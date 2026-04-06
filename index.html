@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educational Data Mining | Student Grade Prediction System</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #38bdf8, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .model-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #38bdf8, #10b981);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            margin-top: 1rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #38bdf8;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            color: #38bdf8;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 1rem;
+            padding: 1.8rem;
+        }
+
+        .card h2 {
+            color: white;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h2 i {
+            color: #38bdf8;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        label i {
+            margin-right: 0.5rem;
+            color: #38bdf8;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 0.5rem;
+            color: white;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        /* Range Slider */
+        input[type="range"] {
+            padding: 0;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(56, 189, 248, 0.2);
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            border: 2px solid white;
+        }
+
+        .range-value {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: #38bdf8;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Button */
+        .predict-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #38bdf8, #10b981);
+            border: none;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3);
+        }
+
+        /* Result Display */
+        .result-display {
+            text-align: center;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(16, 185, 129, 0.1));
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .predicted-grade {
+            font-size: 5rem;
+            font-weight: 800;
+            margin: 1rem 0;
+        }
+
+        .grade-A { color: #10b981; text-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+        .grade-B { color: #38bdf8; text-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
+        .grade-C { color: #f59e0b; text-shadow: 0 0 20px rgba(245, 158, 11, 0.5); }
+        .grade-D { color: #ef4444; text-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+        .grade-F { color: #8b5cf6; text-shadow: 0 0 20px rgba(139, 92, 246, 0.5); }
+
+        .confidence-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #10b981);
+            width: 0%;
+            transition: width 1s ease;
+            border-radius: 10px;
+        }
+
+        .confidence-text {
+            margin-top: 0.5rem;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .reasoning-box {
+            background: rgba(30, 41, 59, 0.6);
+            border-left: 3px solid #38bdf8;
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .reasoning-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .reasoning-text {
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(56, 189, 248, 0.3);
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Chart Grid */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chart-card {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+
+        .chart-card h3 {
+            color: white;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header - No Model Accuracy Display -->
+        <div class="header">
+            <h1>Educational Data Mining</h1>
+            <p class="subtitle">Advanced Student Analytics Platform | Powered by Random Forest</p>
+            <div class="model-badge">
+                <i class="fas fa-brain"></i> Random Forest Classifier
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-value" id="totalStudents">-</div>
+                <div class="stat-label">Total Students</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-value" id="avgStudyHours">-</div>
+                <div class="stat-label">Avg Study Hours/Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="stat-value" id="avgAttendance">-</div>
+                <div class="stat-label">Avg Attendance (%)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-star"></i></div>
+                <div class="stat-value" id="avgScore">-</div>
+                <div class="stat-label">Avg Overall Score</div>
+            </div>
+        </div>
+
+        <!-- Main Prediction Section -->
+        <div class="main-grid">
+            <!-- Input Form -->
+            <div class="card">
+                <h2><i class="fas fa-sliders-h"></i> Student Parameters</h2>
+                <form id="predictionForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Student Name</label>
+                        <input type="text" id="studentName" placeholder="Enter name" value="Emma Wilson">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-birthday-cake"></i> Age</label>
+                        <select id="age">
+                            <option value="9">9 years</option>
+                            <option value="10" selected>10 years</option>
+                            <option value="11">11 years</option>
+                            <option value="12">12 years</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-venus-mars"></i> Gender</label>
+                        <select id="gender">
+                            <option value="Male">Male</option>
+                            <option value="Female" selected>Female</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-school"></i> School Type</label>
+                        <select id="schoolType">
+                            <option value="Public">Public School</option>
+                            <option value="Private" selected>Private School</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-chalkboard-user"></i> Parent Education</label>
+                        <select id="parentEducation">
+                            <option value="High School">High School</option>
+                            <option value="Bachelor">Bachelor's Degree</option>
+                            <option value="Master" selected>Master's Degree</option>
+                            <option value="PhD">PhD/Doctorate</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-clock"></i> Study Hours/Week</label>
+                        <input type="range" id="studyHours" min="0" max="40" step="0.5" value="15">
+                        <div><span class="range-value" id="studyHoursValue">15</span> hours</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt"></i> Attendance Percentage</label>
+                        <input type="range" id="attendance" min="0" max="100" step="1" value="85">
+                        <div><span class="range-value" id="attendanceValue">85</span>%</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-wifi"></i> Internet Access</label>
+                        <select id="internetAccess">
+                            <option value="Yes" selected>Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="predict-btn" id="predictBtn">
+                        <i class="fas fa-brain"></i> Predict Grade
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Result Display -->
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> Result</h2>
+                <div id="resultArea">
+                    <div class="result-display">
+                        <div class="predicted-grade" id="gradeDisplay">?</div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" id="confidenceFill"></div>
+                        </div>
+                        <div class="confidence-text" id="confidenceText">Click Predict to start</div>
+                    </div>
+                    
+                    <div class="reasoning-box">
+                        <div class="reasoning-header">
+                            <i class="fas fa-microscope"></i>
+                            <span>Reasoning</span>
+                        </div>
+                        <div class="reasoning-text" id="reasoningText">
+                            Enter student details and click "Predict Grade" to see detailed analysis from the Random Forest model.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="chart-grid">
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-pie"></i> Grade Distribution</h3>
+                <canvas id="gradeChart" style="width: 100%; height: 250px;"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3><i class="fas fa-chart-bar"></i> Feature Importance</h3>
+                <canvas id="importanceChart" style="width: 100%; height: 250px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize charts
+        let gradeChart, importanceChart;
+        
+        // Load summary data
+        async function loadSummary() {
+            try {
+                const response = await fetch('/api/data_summary');
+                const data = await response.json();
+                
+                document.getElementById('totalStudents').textContent = data.total_students;
+                document.getElementById('avgStudyHours').textContent = data.avg_study_hours;
+                document.getElementById('avgAttendance').textContent = data.avg_attendance;
+                document.getElementById('avgScore').textContent = data.avg_score;
+                
+                // Update grade chart
+                const gradeData = data.grade_distribution;
+                if (gradeChart) {
+                    gradeChart.data.datasets[0].data = Object.values(gradeData);
+                    gradeChart.data.labels = Object.keys(gradeData);
+                    gradeChart.update();
+                }
+            } catch (error) {
+                console.error('Error loading summary:', error);
+            }
+        }
+        
+        // Load feature importance
+        async function loadFeatureImportance() {
+            try {
+                const defaultData = {
+                    age: 10,
+                    gender: 'Female',
+                    school_type: 'Private',
+                    parent_education: 'Master',
+                    study_hours: 15,
+                    attendance: 85,
+                    internet_access: 'Yes'
+                };
+                
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(defaultData)
+                });
+                
+                const result = await response.json();
+                if (result.success && result.feature_importance) {
+                    const importance = result.feature_importance;
+                    const labels = Object.keys(importance).map(key => 
+                        key.replace('_', ' ').replace('education', ' Edu').replace('access', '')
+                    );
+                    const values = Object.values(importance);
+                    
+                    if (importanceChart) {
+                        importanceChart.data.datasets[0].data = values;
+                        importanceChart.data.labels = labels;
+                        importanceChart.update();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading importance:', error);
+            }
+        }
+        
+        // Handle prediction
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const predictBtn = document.getElementById('predictBtn');
+            const originalText = predictBtn.innerHTML;
+            predictBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+            predictBtn.disabled = true;
+            
+            const studentName = document.getElementById('studentName').value;
+            const data = {
+                name: studentName,
+                age: parseInt(document.getElementById('age').value),
+                gender: document.getElementById('gender').value,
+                school_type: document.getElementById('schoolType').value,
+                parent_education: document.getElementById('parentEducation').value,
+                study_hours: parseFloat(document.getElementById('studyHours').value),
+                attendance: parseFloat(document.getElementById('attendance').value),
+                internet_access: document.getElementById('internetAccess').value
+            };
+            
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Update grade display
+                    const gradeElement = document.getElementById('gradeDisplay');
+                    gradeElement.textContent = result.predicted_grade;
+                    gradeElement.className = `predicted-grade grade-${result.predicted_grade}`;
+                    
+                    // Update confidence bar
+                    const confidenceFill = document.getElementById('confidenceFill');
+                    confidenceFill.style.width = `${result.confidence}%`;
+                    document.getElementById('confidenceText').innerHTML = `${result.confidence}% Confidence`;
+                    
+                    // Update reasoning - format with line breaks
+                    const reasoningText = result.reasoning.replace(/\|/g, '<br>');
+                    document.getElementById('reasoningText').innerHTML = reasoningText;
+                    
+                    // Update feature importance chart
+                    if (result.feature_importance && importanceChart) {
+                        const labels = Object.keys(result.feature_importance).map(key => 
+                            key.replace('_', ' ').replace('education', ' Edu').replace('access', '')
+                        );
+                        const values = Object.values(result.feature_importance);
+                        importanceChart.data.datasets[0].data = values;
+                        importanceChart.data.labels = labels;
+                        importanceChart.update();
+                    }
+                } else {
+                    document.getElementById('reasoningText').innerHTML = `Error: ${result.error}`;
+                }
+            } catch (error) {
+                document.getElementById('reasoningText').innerHTML = `Error: ${error.message}`;
+            }
+            
+            predictBtn.innerHTML = originalText;
+            predictBtn.disabled = false;
+        });
+        
+        // Initialize charts
+        function initCharts() {
+            // Grade distribution chart
+            const gradeCtx = document.getElementById('gradeChart').getContext('2d');
+            gradeChart = new Chart(gradeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['A', 'B', 'C', 'D', 'F'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0],
+                        backgroundColor: ['#10b981', '#38bdf8', '#f59e0b', '#ef4444', '#8b5cf6'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: { color: 'white', font: { size: 11 } },
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Feature importance chart
+            const impCtx = document.getElementById('importanceChart').getContext('2d');
+            importanceChart = new Chart(impCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Study Hours', 'Attendance', 'Parent Edu', 'School Type', 'Internet', 'Age', 'Gender'],
+                    datasets: [{
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        backgroundColor: '#38bdf8',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Importance (%)', color: '#94a3b8' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            ticks: { color: '#94a3b8', maxRotation: 45, minRotation: 45 }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Range slider updates
+        document.getElementById('studyHours').addEventListener('input', () => {
+            document.getElementById('studyHoursValue').textContent = document.getElementById('studyHours').value;
+        });
+        
+        document.getElementById('attendance').addEventListener('input', () => {
+            document.getElementById('attendanceValue').textContent = document.getElementById('attendance').value;
+        });
+        
+        // Initialize everything
+        initCharts();
+        loadSummary();
+        loadFeatureImportance();
+        
+        // Auto-predict on load
+        setTimeout(() => {
+            document.getElementById('predictBtn').click();
+        }, 500);
+    </script>
+</body>
+</html>
